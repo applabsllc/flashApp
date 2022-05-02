@@ -14,12 +14,13 @@ import Torch from 'react-native-torch';
 const App = ()  => {
 
   const [flashActive, setFlashActive] = useState(false);
+  const [strobeActive, setStrobeActive] = useState(false);
 
   const labelButton1 = "Turn Flashlight " + (flashActive?"Off":"On");
   const labelButton2 = "Strobe";
   const labelButton3 = "SOS";
 
-  const operateFlashlight = async () => { //function to turn on and off simple flashlight
+  const operateFlashlight = async (interval = 0) => { //function to turn on and off simple flashlight
     const currentActive = flashActive;
     console.log("currentActive:", currentActive);
         
@@ -28,13 +29,15 @@ const App = ()  => {
           Torch.switchState(!currentActive);
           setFlashActive(!currentActive);
 
+          if(interval > 0 && strobeActive)setTimeout(() => operateFlashlight(interval), interval);
+
       } else { //Android
 
           try {
 
               const cameraAllowed = await Torch.requestCameraPermission(
                 'Camera Permissions',
-                'This app requires camera permissions to use the Flashlight feature' // dialog body
+                'This app requires camera permissions to use the Flashlight feature'
               );
 
               Torch.switchState(!currentActive);
@@ -52,7 +55,15 @@ const App = ()  => {
   }
 
   const operateStrobe = () => { //function to turn flash on/off on interval
-    console.log("click operateStrobe");
+    console.log("click operateStrobe:", strobeActive);
+
+    if(strobeActive){
+      
+    } else {
+      
+    }
+
+    setStrobeActive(!strobeActive);
 
   }
 
