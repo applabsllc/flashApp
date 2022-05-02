@@ -2,13 +2,14 @@ import React , { useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
-  StatusBar,
+  Platform,
   StyleSheet,
   Text,
   Button,
   View,
+  ToastAndroid,
 } from 'react-native';
-
+import Torch from 'react-native-torch';
 
 const App = ()  => {
 
@@ -18,10 +19,36 @@ const App = ()  => {
   const labelButton2 = "Strobe";
   const labelButton3 = "SOS";
 
-  const operateFlashlight = () => { //function to turn on an off simple flashlight
+  const operateFlashlight = async () => { //function to turn on and off simple flashlight
     const currentActive = flashActive;
     console.log("currentActive:", currentActive);
-    setFlashActive(!currentActive);
+        
+      if (Platform.OS === 'ios') {// IOS
+
+          Torch.switchState(!currentActive);
+          setFlashActive(!currentActive);
+
+      } else { //Android
+
+          try {
+
+              const cameraAllowed = await Torch.requestCameraPermission(
+                'Camera Permissions',
+                'This app requires camera permissions to use the Flashlight feature' // dialog body
+              );
+
+              Torch.switchState(!currentActive);
+              setFlashActive(!currentActive);
+
+           } catch (e) {
+
+              ToastAndroid.show(
+                'There was an issue accessing your FlashLight',
+                ToastAndroid.SHORT
+              );
+
+          }//end try/catch
+      }//end else
   }
 
   const operateStrobe = () => { //function to turn flash on/off on interval
@@ -35,7 +62,7 @@ const App = ()  => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.topContainer} />
       <View style={styles.bottomContainer} >
         <View style={styles.buttonWrapper}>
@@ -57,7 +84,7 @@ const App = ()  => {
         />
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
