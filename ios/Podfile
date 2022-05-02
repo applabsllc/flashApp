@@ -19,6 +19,8 @@ target 'flashApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'react-native-torch', :path => '../node_modules/react-native-torch'
+
   target 'flashAppTests' do
     inherit! :complete
     # Pods for testing
