@@ -22,7 +22,6 @@ const App = ()  => {
     const currentActive = flashActive;
     console.log("currentActive:", currentActive);
     setFlashActive(!currentActive);
-    
   }
 
   const operateStrobe = () => { //function to turn flash on/off on interval
@@ -41,21 +40,18 @@ const App = ()  => {
       <View style={styles.bottomContainer} >
         <View style={styles.buttonWrapper}>
           <Button
-            
             onPress={operateFlashlight}
             title={labelButton1}
           />
         </View>
         <View style={styles.buttonWrapper}>
         <Button
-        style={styles.buttonWrapper}
           onPress={operateStrobe}
           title={labelButton2}
         />
         </View>
         <View style={styles.buttonWrapper}>
         <Button
-          style={styles.buttonWrapper}
           onPress={operateSOS}
           title={labelButton3}
         />
@@ -66,7 +62,7 @@ const App = ()  => {
 };
 
 const styles = StyleSheet.create({
-	 container: {
+  container: {
 		flex: 1,
     flexDirection: "column",
   },
