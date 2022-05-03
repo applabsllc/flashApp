@@ -1,4 +1,4 @@
-import React , { useState} from 'react';
+import React , { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -32,7 +32,7 @@ const App = ()  => {
   const callFlashApi = (isOn = null, interval = 0) => {
 
     const currentFlashOn = flashOn;
-    const finalOn = isOn === null ? currentFlashOn : isOn;
+    const finalOn = isOn === null ? !currentFlashOn : isOn;
     console.log("= Flash " + (finalOn ? "On" : "Off"));
     setFlashOn(finalOn);
     Torch.switchState(finalOn);
@@ -66,7 +66,7 @@ const App = ()  => {
     setFlashlightActive(false);
     setStrobeActive(false);
     setSosActive(false);
-    Torch.switchState(false);
+    callFlashApi(false);
   }
 
   const operateFlashlight = () => { //function to turn on and off simple flashlight
@@ -76,6 +76,7 @@ const App = ()  => {
     if(allowed){
       setFlashlightActive(!currentActive);
       callFlashApi(!currentActive);
+      setStrobeActive(false);
     }else{
       handleCameraPermError();
     }
@@ -90,9 +91,9 @@ const App = ()  => {
 
     if(strobeActive){ //case strobe was on, turn off
       setStrobeActive(false);
-      console.log("strobe off");
+      console.log("Strobe turned OFF");
     } else { //case strobe was off, turn on
-      console.log("strobe on");
+      console.log("Strobe turne ON");
       setFlashlightActive(false);
       setSosActive(false);
       setStrobeActive(true);
