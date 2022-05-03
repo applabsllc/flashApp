@@ -13,63 +13,99 @@ import Torch from 'react-native-torch';
 
 const App = ()  => {
 
-  const [flashActive, setFlashActive] = useState(false);
+  const [flashOn, setFlashOn] = useState(false);
+  const [flashlightActive, setFlashlightActive] = useState(false);
   const [strobeActive, setStrobeActive] = useState(false);
+  const [sosActive, setSosActive] = useState(false);
 
-  const labelButton1 = "Turn Flashlight " + (flashActive?"Off":"On");
-  const labelButton2 = "Strobe";
+  const labelButton1 = "Turn Flashlight " + (flashlightActive?"Off":"On");
+  const labelButton2 = "Strobe (" + (strobeActive ? "ON" : "Off" ) + ")";
   const labelButton3 = "SOS";
 
-  const operateFlashlight = async (interval = 0) => { //function to turn on and off simple flashlight
-    const currentActive = flashActive;
-    console.log("currentActive:", currentActive);
-        
-      if (Platform.OS === 'ios') {// IOS
+  global.cameraPermAllowed = false;
 
-          Torch.switchState(!currentActive);
-          setFlashActive(!currentActive);
+  const getCurrentTime = () => {
+    let rightNow = new Date();
+    return rightNow.getSeconds();
+  }
 
-          if(interval > 0 && strobeActive)setTimeout(() => operateFlashlight(interval), interval);
+  const callFlashApi = (isOn = null, interval = 0) => {
 
-      } else { //Android
+    const currentFlashOn = flashOn;
+    const finalOn = isOn === null ? currentFlashOn : isOn;
+    console.log("= Flash " + (finalOn ? "On" : "Off"));
+    setFlashOn(finalOn);
+    Torch.switchState(finalOn);
 
-          try {
+    if(interval)
+    setTimeout(() => callFlashApi(!finalOn, interval), interval);
+  }
 
-              const cameraAllowed = await Torch.requestCameraPermission(
-                'Camera Permissions',
-                'This app requires camera permissions to use the Flashlight feature'
-              );
+  const getCameraAllowed = async () => {
 
-              Torch.switchState(!currentActive);
-              setFlashActive(!currentActive);
+    if(global.cameraPermAllowed) return true;
 
-           } catch (e) {
+    try {
+      let cameraAllowed = await Torch.requestCameraPermission(
+        'Camera Permissions',
+        'This app requires camera permissions to use the Flashlight feature'
+      );
+      global.cameraPermAllowed = cameraAllowed;
+      return cameraAllowed;
+    } catch (e) {
+      handleCameraPermError();
+    }//end try/catch
+  }
 
-              ToastAndroid.show(
-                'There was an issue accessing your FlashLight',
-                ToastAndroid.SHORT
-              );
+  const handleCameraPermError = () => {
 
-          }//end try/catch
-      }//end else
+    ToastAndroid.show(
+      'There was an issue accessing your FlashLight',
+      ToastAndroid.SHORT
+    );
+    setFlashlightActive(false);
+    setStrobeActive(false);
+    setSosActive(false);
+    Torch.switchState(false);
+  }
+
+  const operateFlashlight = () => { //function to turn on and off simple flashlight
+    const currentActive = flashlightActive;
+    const allowed = getCameraAllowed();
+
+    if(allowed){
+      setFlashlightActive(!currentActive);
+      callFlashApi(!currentActive);
+    }else{
+      handleCameraPermError();
+    }
+     
   }
 
   const operateStrobe = () => { //function to turn flash on/off on interval
     console.log("click operateStrobe:", strobeActive);
+    const allowed = getCameraAllowed();
 
-    if(strobeActive){
-      
-    } else {
+    if(!allowed){ handleCameraPermError(); return; }
+
+    if(strobeActive){ //case strobe was on, turn off
+      setStrobeActive(false);
+      console.log("strobe off");
+    } else { //case strobe was off, turn on
+      console.log("strobe on");
+      setFlashlightActive(false);
+      setSosActive(false);
+      setStrobeActive(true);
+
+      let interval = 1500;
+      callFlashApi(null, interval);
       
     }
-
-    setStrobeActive(!strobeActive);
 
   }
 
   const operateSOS = () => { // call sequenced operateStrobe()
     console.log("click operateSOS");
-    
   }
 
   return (
