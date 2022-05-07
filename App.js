@@ -37,7 +37,7 @@ const App = ()  => {
     setFlashOn(finalOn);
     Torch.switchState(finalOn);
 
-    if(interval)
+    if(interval && setStrobeActive)
     setTimeout(() => callFlashApi(!finalOn, interval), interval);
   }
 
@@ -105,8 +105,16 @@ const App = ()  => {
 
   }
 
-  const operateSOS = () => { // call sequenced operateStrobe()
-    console.log("click operateSOS");
+  const operateSOS = () => { // call sequenced flash
+	
+	console.log("= operateSOS ON");
+	
+	const ticks = [500,500,500,2000,2000,500,500];//sequence for SOS in duration
+	
+	//logic to loop through ticks
+	
+    
+	
   }
 
   return (
