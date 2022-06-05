@@ -1,0 +1,1 @@
+export const PERM_CAMERA = 'PERM_CAMERA'

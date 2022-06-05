@@ -10,8 +10,12 @@ import {
   ToastAndroid,
 } from 'react-native';
 import Torch from 'react-native-torch';
+import { connect } from 'react-redux';
+import { setCameraPermission } from './actions/permissions';
+import { bindActionCreators } from 'redux';
 
-const App = ()  => {
+
+const App = (props)  => {
 
   const [flashOn, setFlashOn] = useState(false);
   const [flashlightActive, setFlashlightActive] = useState(false);
@@ -22,7 +26,7 @@ const App = ()  => {
   const labelButton2 = "Strobe (" + (strobeActive ? "ON" : "Off" ) + ")";
   const labelButton3 = "SOS";
 
-  global.cameraPermAllowed = false;
+  let { cameraPerm, actions } = props;
 
   const getCurrentTime = () => {
     let rightNow = new Date();
@@ -43,14 +47,14 @@ const App = ()  => {
 
   const getCameraAllowed = async () => {
 
-    if(global.cameraPermAllowed) return true;
+    if(cameraPerm) return true;
 
     try {
       let cameraAllowed = await Torch.requestCameraPermission(
         'Camera Permissions',
         'This app requires camera permissions to use the Flashlight feature'
       );
-      global.cameraPermAllowed = cameraAllowed;
+      setCameraPermission(cameraAllowed);
       return cameraAllowed;
     } catch (e) {
       handleCameraPermError();
@@ -162,4 +166,18 @@ const styles = StyleSheet.create({
   }
 });
 
-export default App;
+
+const mapStateToProps = state => ({
+  cameraPerm: state.cameraPerm,
+});
+
+const ActionCreators = Object.assign(
+  {},
+  setCameraPermission,
+);
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(ActionCreators, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
